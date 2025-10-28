@@ -5,368 +5,14 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Cashflow Kuadran Monitor</title>
 
-    <!-- Font & Icons -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="assets/style.css" />
+
+    <!-- ChartJS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        :root {
-            --bg-main: #000000;
-            --bg-card: radial-gradient(circle at 20% 20%, #1a1f1c 0%, #0a0f0c 60%);
-            --border-card: rgba(46, 204, 113, 0.15);
-            --accent: #2ecc71;
-            --accent-dim: rgba(46, 204, 113, 0.2);
-            --text-main: #ffffff;
-            --text-dim: #8b928d;
-            --danger: #ff4d4d;
-            --radius-xl: 20px;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            background: radial-gradient(circle at 10% 0%, #0f2015 0%, #000000 60%);
-            color: var(--text-main);
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.4;
-            padding: 16px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
-
-        h1,h2,h3,h4 {
-            font-weight: 600;
-            color: var(--text-main);
-            line-height: 1.2;
-        }
-
-        .hidden { display: none; }
-
-        /* Layout cards dasar */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: var(--radius-xl);
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-
-        .topbar-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--accent);
-        }
-
-        .topbar-sub {
-            font-size: .8rem;
-            color: var(--text-dim);
-            line-height: 1.2;
-        }
-
-        button,
-        .btn {
-            appearance: none;
-            border: 0;
-            outline: 0;
-            background: var(--accent);
-            color: #000;
-            font-weight: 600;
-            border-radius: 12px;
-            padding: 10px 14px;
-            font-size: .9rem;
-            line-height: 1.2;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        .btn-outline {
-            background: rgba(46,204,113,0.07);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-        }
-
-        /* LOGIN CARD */
-        .login-card-title {
-            font-size: 1.1rem;
-            margin-bottom: 4px;
-        }
-        .login-desc {
-            font-size: .8rem;
-            color: var(--text-dim);
-            margin-bottom: 16px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            font-size: .8rem;
-            color: var(--text-dim);
-            margin-bottom: 6px;
-        }
-
-        .form-group input,
-        .form-group select {
-            background: #0f1612;
-            border: 1px solid rgba(46,204,113,0.3);
-            border-radius: 12px;
-            padding: 12px;
-            color: var(--text-main);
-            font-size: .9rem;
-            font-family: inherit;
-        }
-
-        .form-row-2col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        /* SUMMARY GRID */
-        .summary-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 12px;
-        }
-        .summary-header .left .title {
-            font-size: .9rem;
-            font-weight: 600;
-            color: var(--accent);
-        }
-        .summary-header .left .sub {
-            font-size: .7rem;
-            color: var(--text-dim);
-        }
-        .summary-header .year-label {
-            font-size: .8rem;
-            color: var(--text-main);
-            background: rgba(46,204,113,0.1);
-            border: 1px solid rgba(46,204,113,0.4);
-            padding: 4px 8px;
-            border-radius: 10px;
-            line-height: 1.2;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .sum-card {
-            background: rgba(15,22,18,0.6);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 12px;
-            min-height: 88px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .sum-label {
-            font-size: .7rem;
-            color: var(--text-dim);
-            margin-bottom: 4px;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-        .sum-label .quad {
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .sum-amount {
-            font-size: .9rem;
-            font-weight: 600;
-            color: var(--text-main);
-            line-height: 1.2;
-        }
-
-        .sum-percent {
-            font-size: .8rem;
-            font-weight: 500;
-            color: var(--accent);
-        }
-
-        /* CHART GRID */
-        .chart-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .chart-card-header {
-            font-size: .9rem;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            line-height: 1.3;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            width: 100%;
-            height: 240px;
-        }
-
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        .legend-box {
-            margin-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.07);
-            padding-top: 12px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .legend-item {
-            display: flex;
-            flex-direction: column;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
-            padding: 8px;
-            min-height: 60px;
-        }
-
-        .legend-row-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 4px;
-        }
-
-        .legend-color {
-            width: 10px;
-            height: 10px;
-            border-radius: 3px;
-        }
-
-        .legend-q {
-            font-size: .75rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .legend-percent {
-            font-size: .8rem;
-            font-weight: 600;
-            color: var(--accent);
-        }
-
-        .legend-amount {
-            font-size: .7rem;
-            color: var(--text-dim);
-            line-height: 1.2;
-        }
-
-        /* ADMIN FORM / TABLE */
-        .section-title {
-            font-size: .9rem;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            line-height: 1.3;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 12px;
-        }
-
-        table {
-            width: 100%;
-            min-width: 520px;
-            border-collapse: collapse;
-            font-size: .8rem;
-            color: var(--text-main);
-        }
-
-        thead {
-            background: rgba(46,204,113,0.07);
-        }
-
-        thead th {
-            text-align: left;
-            font-weight: 500;
-            color: var(--accent);
-            padding: 10px;
-            white-space: nowrap;
-        }
-
-        tbody td {
-            padding: 10px;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            vertical-align: top;
-        }
-
-        td.text-right {
-            text-align: right;
-        }
-
-        .btn-del {
-            background: var(--danger);
-            color: #fff;
-            border: 0;
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-size: .7rem;
-            font-weight: 600;
-        }
-
-        /* Small note text */
-        .note {
-            font-size: .7rem;
-            color: var(--text-dim);
-            line-height: 1.3;
-        }
-
-        /* Logout btn style in topbar */
-        #logoutBtn {
-            font-size: .7rem;
-            padding: 8px 10px;
-            line-height: 1.2;
-        }
-
-        /* Small screens tweaks */
-        @media(min-width:480px){
-            body {
-                max-width: 420px;
-            }
-        }
-    </style>
 </head>
 <body>
 
@@ -378,22 +24,44 @@
             tambah penghasilan, dan hapus data.
         </div>
 
+        <div id="loginError" class="login-error-msg">
+            Username / password salah. Perhatikan huruf besar-kecil.
+        </div>
+
         <form id="loginForm">
             <div class="form-group">
                 <label for="loginUser">Username</label>
-                <input id="loginUser" type="text" placeholder="username admin" autocomplete="username" required />
+                <input
+                    id="loginUser"
+                    type="text"
+                    placeholder="username admin"
+                    autocomplete="username"
+                    autocapitalize="none"
+                    autocorrect="off"
+                    spellcheck="false"
+                    required
+                />
             </div>
 
             <div class="form-group">
                 <label for="loginPass">Password</label>
-                <input id="loginPass" type="password" placeholder="password admin" autocomplete="current-password" required />
+                <input
+                    id="loginPass"
+                    type="password"
+                    placeholder="password admin"
+                    autocomplete="current-password"
+                    autocapitalize="none"
+                    autocorrect="off"
+                    spellcheck="false"
+                    required
+                />
             </div>
 
             <button type="submit" style="width:100%;margin-top:8px;">Masuk</button>
 
             <div class="note" style="margin-top:12px;">
-                Catatan keamanan: password ini hanya dibandingkan lokal di browser.
-                Jangan share URL dashboard ini ke orang lain kalau repo kamu publik.
+                Catatan keamanan: password ini dicek di server (folder /api),
+                jadi tidak kelihatan di browser orang lain.
             </div>
         </form>
     </section>
@@ -403,7 +71,7 @@
     <section id="dashboardSection" class="hidden">
 
         <!-- Topbar -->
-        <div class="topbar">
+        <div class="topbar card">
             <div>
                 <div class="topbar-title">Cashflow Kuadran Monitor</div>
                 <div class="topbar-sub">Pantau sumber penghasilanmu (E / S / B / I)</div>
@@ -411,7 +79,7 @@
             <button id="logoutBtn" class="btn-outline" type="button">Logout</button>
         </div>
 
-        <!-- ===== Ringkasan Kuadran Tahun Terbaru ===== -->
+        <!-- ===== RINGKASAN KUADRAN TAHUN TERBARU ===== -->
         <div class="card">
             <div class="summary-header">
                 <div class="left">
@@ -472,9 +140,7 @@
                     <canvas id="donutChart"></canvas>
                 </div>
 
-                <div class="legend-box" id="donutLegend">
-                    <!-- Legend diisi via JS -->
-                </div>
+                <div class="legend-box" id="donutLegend"></div>
             </div>
 
             <!-- Line Chart -->
@@ -501,7 +167,7 @@
         <div class="card">
             <div class="section-title">
                 <span>Tambah Penghasilan (Admin Panel)</span>
-                <span style="font-size:.7rem;color:var(--text-dim);">Data baru langsung disimpan ke JSONBin</span>
+                <span style="font-size:.7rem;color:var(--text-dim);">Data baru langsung disimpan</span>
             </div>
 
             <form id="addIncomeForm">
@@ -532,7 +198,10 @@
                 <div class="form-group">
                     <label for="amountInput">Nominal per Tahun (Rp)</label>
                     <input id="amountInput" type="text" inputmode="numeric" placeholder="100.000.000" required />
-                    <div class="note">Otomatis pakai titik pemisah ribuan. Masukkan total setahun untuk sumber ini.</div>
+                    <div class="note">
+                        Otomatis pakai titik pemisah ribuan.
+                        Masukkan total setahun untuk sumber ini.
+                    </div>
                 </div>
 
                 <button type="submit" style="width:100%;margin-top:8px;">+ Tambah Data</button>
@@ -559,7 +228,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Rows diisi JS -->
+                        <!-- baris data via JS -->
                     </tbody>
                 </table>
             </div>
@@ -574,510 +243,7 @@
         </div>
     </section>
 
-    <script>
-        /********************************************
-         * KONFIGURASI (GANTI INI DENGAN PUNYAMU)
-         ********************************************/
-
-        // --- LOGIN ADMIN ---
-        const ADMIN_USER = "adminhepi";        // GANTI: username login
-        const ADMIN_PASS = "passwordku123";    // GANTI: password login
-
-        // --- JSONBIN ---
-        // 1. Buat Bin baru di https://jsonbin.io
-        // 2. Set Bin nya PRIVATE
-        // 3. Simpan data awal: []   (array kosong)
-        // 4. Ambil Bin ID dan X-Master-Key
-        const BIN_ID = "ISI_BIN_ID_KAMU"; // contoh: "66f123abc89xx1234abcd"
-        const JSONBIN_API_KEY = "ISI_MASTER_KEY_KAMU"; // "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-
-        // URL API JSONBin v3
-        const JSONBIN_LATEST_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
-        const JSONBIN_PUT_URL    = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-
-        /********************************************
-         * STATE GLOBAL
-         ********************************************/
-        let incomeData = []; // array objek penghasilan
-        let donutChart = null;
-        let lineChart = null;
-        let tableBodyEl = null;
-
-        /********************************************
-         * HELPER FORMAT ANGKA
-         ********************************************/
-        function formatNumberID(num) {
-            // num bisa string digit-only atau number
-            if (num === "" || num === null || num === undefined) return "";
-            const n = typeof num === "string" ? parseInt(num, 10) : num;
-            if (isNaN(n)) return "";
-            return n.toLocaleString("id-ID"); // pakai titik ribuan
-        }
-
-        function formatRupiah(num) {
-            const formatted = formatNumberID(num);
-            return "Rp" + (formatted === "" ? "0" : formatted);
-        }
-
-        // convert "100.000.000" -> 100000000 (number)
-        function parseNumberFromIDFormat(str) {
-            if (!str) return 0;
-            // ambil digit saja
-            const digitsOnly = str.replace(/\D/g, "");
-            return digitsOnly === "" ? 0 : parseInt(digitsOnly, 10);
-        }
-
-        /********************************************
-         * LOGIN / LOGOUT HANDLER
-         ********************************************/
-        function isLoggedIn() {
-            return localStorage.getItem("loggedIn") === "true";
-        }
-
-        function showLogin() {
-            document.getElementById("loginSection").classList.remove("hidden");
-            document.getElementById("dashboardSection").classList.add("hidden");
-        }
-
-        function showDashboard() {
-            document.getElementById("loginSection").classList.add("hidden");
-            document.getElementById("dashboardSection").classList.remove("hidden");
-        }
-
-        function handleLoginSubmit(e) {
-            e.preventDefault();
-            const u = document.getElementById("loginUser").value.trim();
-            const p = document.getElementById("loginPass").value.trim();
-
-            if (u === ADMIN_USER && p === ADMIN_PASS) {
-                localStorage.setItem("loggedIn", "true");
-                showDashboard();
-                fetchDataFromJSONBin();
-            } else {
-                alert("Username / password salah.");
-            }
-        }
-
-        function handleLogout() {
-            localStorage.removeItem("loggedIn");
-            // Optional: bersihin chart biar nggak keliatan data setelah logout
-            if (donutChart) { donutChart.destroy(); donutChart = null; }
-            if (lineChart) { lineChart.destroy(); lineChart = null; }
-            incomeData = [];
-            showLogin();
-        }
-
-        /********************************************
-         * JSONBIN FETCH & SAVE
-         ********************************************/
-        async function fetchDataFromJSONBin() {
-            try {
-                const res = await fetch(JSONBIN_LATEST_URL, {
-                    headers: {
-                        "X-Master-Key": JSONBIN_API_KEY
-                    }
-                });
-                const json = await res.json();
-                // data utama ada di json.record
-                incomeData = Array.isArray(json.record) ? json.record : [];
-                renderAll();
-            } catch (err) {
-                console.error("Gagal ambil data JSONBin:", err);
-                alert("Gagal ambil data dari JSONBin.");
-            }
-        }
-
-        async function saveDataToJSONBin() {
-            try {
-                await fetch(JSONBIN_PUT_URL, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Master-Key": JSONBIN_API_KEY
-                    },
-                    body: JSON.stringify(incomeData)
-                });
-            } catch (err) {
-                console.error("Gagal simpan data JSONBin:", err);
-                alert("Gagal simpan data ke JSONBin.");
-            }
-        }
-
-        /********************************************
-         * AGREGASI DATA
-         ********************************************/
-        // hasil: { "2024": {E:...,S:...,B:...,I:...}, "2025": {...} }
-        function getYearlyTotals() {
-            const yearly = {};
-            incomeData.forEach(item => {
-                const y = String(item.year);
-                const q = item.quadrant ? item.quadrant.toUpperCase() : "";
-                const amt = Number(item.amount) || 0;
-                if (!yearly[y]) {
-                    yearly[y] = { E:0, S:0, B:0, I:0 };
-                }
-                if (!yearly[y][q]) {
-                    yearly[y][q] = 0;
-                }
-                yearly[y][q] += amt;
-            });
-            return yearly;
-        }
-
-        function getLatestYear(yearlyTotalsObj) {
-            const years = Object.keys(yearlyTotalsObj).map(y => parseInt(y,10)).sort((a,b)=>a-b);
-            if (years.length === 0) return null;
-            return years[years.length - 1].toString();
-        }
-
-        /********************************************
-         * RENDER RINGKASAN + PERSENTASE
-         ********************************************/
-        function updateSummaryCards() {
-            const yearlyTotals = getYearlyTotals();
-            const latestYear = getLatestYear(yearlyTotals);
-
-            const yearLabelEl = document.getElementById("summaryYear");
-            const donutYearLabel = document.getElementById("donutYearLabel");
-
-            // reset default
-            const zeroObj = {E:0,S:0,B:0,I:0};
-
-            let dataYear = zeroObj;
-            if (latestYear && yearlyTotals[latestYear]) {
-                dataYear = yearlyTotals[latestYear];
-            }
-
-            const totalAll =
-                (dataYear.E||0) + (dataYear.S||0) +
-                (dataYear.B||0) + (dataYear.I||0);
-
-            yearLabelEl.textContent = latestYear ? latestYear : "-";
-            donutYearLabel.textContent = latestYear ? latestYear : "-";
-
-            // helper:
-            function pct(part, whole){
-                if (!whole || whole===0) return "0%";
-                return ((part/whole)*100).toFixed(1) + "%";
-            }
-
-            // Set card values
-            document.getElementById("amountE").textContent = formatRupiah(dataYear.E||0);
-            document.getElementById("amountS").textContent = formatRupiah(dataYear.S||0);
-            document.getElementById("amountB").textContent = formatRupiah(dataYear.B||0);
-            document.getElementById("amountI").textContent = formatRupiah(dataYear.I||0);
-
-            document.getElementById("percentE").textContent = pct(dataYear.E||0, totalAll);
-            document.getElementById("percentS").textContent = pct(dataYear.S||0, totalAll);
-            document.getElementById("percentB").textContent = pct(dataYear.B||0, totalAll);
-            document.getElementById("percentI").textContent = pct(dataYear.I||0, totalAll);
-        }
-
-        /********************************************
-         * RENDER DONUT CHART
-         ********************************************/
-        function renderDonutChart() {
-            const yearlyTotals = getYearlyTotals();
-            const latestYear = getLatestYear(yearlyTotals);
-
-            const donutCtx = document.getElementById("donutChart").getContext("2d");
-
-            const dataYear = latestYear && yearlyTotals[latestYear]
-                ? yearlyTotals[latestYear]
-                : {E:0,S:0,B:0,I:0};
-
-            const donutDataArr = [
-                dataYear.E||0,
-                dataYear.S||0,
-                dataYear.B||0,
-                dataYear.I||0
-            ];
-
-            // Destroy first to avoid duplicate charts
-            if (donutChart) donutChart.destroy();
-
-            donutChart = new Chart(donutCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ["E", "S", "B", "I"],
-                    datasets: [{
-                        data: donutDataArr,
-                        backgroundColor: [
-                            "#4ade80", // E
-                            "#22c55e", // S
-                            "#0ea5e9", // B
-                            "#a855f7"  // I
-                        ],
-                        borderColor: "#000000",
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    cutout: "60%"
-                }
-            });
-
-            // Bangun legend custom + persen
-            const totalAll = donutDataArr.reduce((a,b)=>a+b,0);
-            const legendBox = document.getElementById("donutLegend");
-            legendBox.innerHTML = "";
-
-            const quadInfo = [
-                {label:"E - Employee", color:"#4ade80", val:dataYear.E||0},
-                {label:"S - Self Employed", color:"#22c55e", val:dataYear.S||0},
-                {label:"B - Business", color:"#0ea5e9", val:dataYear.B||0},
-                {label:"I - Investor", color:"#a855f7", val:dataYear.I||0}
-            ];
-
-            quadInfo.forEach(q => {
-                const percent = (!totalAll || totalAll===0)
-                    ? "0%"
-                    : ((q.val/totalAll)*100).toFixed(1)+"%";
-
-                const itemDiv = document.createElement("div");
-                itemDiv.className = "legend-item";
-
-                itemDiv.innerHTML = `
-                    <div class="legend-row-top">
-                        <div style="display:flex;align-items:center;gap:6px;">
-                            <div class="legend-color" style="background:${q.color};"></div>
-                            <div class="legend-q">${q.label}</div>
-                        </div>
-                        <div class="legend-percent">${percent}</div>
-                    </div>
-                    <div class="legend-amount">${formatRupiah(q.val||0)}</div>
-                `;
-                legendBox.appendChild(itemDiv);
-            });
-        }
-
-        /********************************************
-         * RENDER LINE CHART
-         ********************************************/
-        function renderLineChart() {
-            const yearlyTotals = getYearlyTotals();
-            const yearsSorted = Object.keys(yearlyTotals)
-                .map(y => parseInt(y,10))
-                .sort((a,b)=>a-b)
-                .map(y => y.toString());
-
-            const dataE = yearsSorted.map(y => yearlyTotals[y].E || 0);
-            const dataS = yearsSorted.map(y => yearlyTotals[y].S || 0);
-            const dataB = yearsSorted.map(y => yearlyTotals[y].B || 0);
-            const dataI = yearsSorted.map(y => yearlyTotals[y].I || 0);
-
-            const lineCtx = document.getElementById("lineChart").getContext("2d");
-
-            if (lineChart) lineChart.destroy();
-
-            lineChart = new Chart(lineCtx, {
-                type: 'line',
-                data: {
-                    labels: yearsSorted,
-                    datasets: [
-                        {
-                            label: "E",
-                            data: dataE,
-                            borderColor: "#4ade80",
-                            backgroundColor: "#4ade80",
-                            tension: 0.3,
-                            borderWidth: 2,
-                            pointRadius: 3
-                        },
-                        {
-                            label: "S",
-                            data: dataS,
-                            borderColor: "#22c55e",
-                            backgroundColor: "#22c55e",
-                            tension: 0.3,
-                            borderWidth: 2,
-                            pointRadius: 3
-                        },
-                        {
-                            label: "B",
-                            data: dataB,
-                            borderColor: "#0ea5e9",
-                            backgroundColor: "#0ea5e9",
-                            tension: 0.3,
-                            borderWidth: 2,
-                            pointRadius: 3
-                        },
-                        {
-                            label: "I",
-                            data: dataI,
-                            borderColor: "#a855f7",
-                            backgroundColor: "#a855f7",
-                            tension: 0.3,
-                            borderWidth: 2,
-                            pointRadius: 3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: "#ffffff",
-                                font: { size: 10 }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            ticks: {
-                                color: "#ffffff",
-                                font: { size: 10 }
-                            },
-                            grid: {
-                                color: "rgba(255,255,255,0.08)"
-                            }
-                        },
-                        y: {
-                            ticks: {
-                                color: "#ffffff",
-                                font: { size: 10 },
-                                callback: function(value) {
-                                    return "Rp" + Number(value).toLocaleString("id-ID");
-                                }
-                            },
-                            grid: {
-                                color: "rgba(255,255,255,0.08)"
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        /********************************************
-         * RENDER TABLE
-         ********************************************/
-        function renderTable() {
-            if (!tableBodyEl) {
-                tableBodyEl = document.querySelector("#incomeTable tbody");
-            }
-            tableBodyEl.innerHTML = "";
-
-            // sort: terbaru dulu
-            const sorted = [...incomeData].sort((a,b) => {
-                // sort by year desc, then amount desc
-                if (b.year !== a.year) return b.year - a.year;
-                return (b.amount||0) - (a.amount||0);
-            });
-
-            sorted.forEach(item => {
-                const tr = document.createElement("tr");
-
-                tr.innerHTML = `
-                    <td>${item.year || "-"}</td>
-                    <td>${item.quadrant || "-"}</td>
-                    <td>${item.sector || "-"}</td>
-                    <td class="text-right">${formatRupiah(item.amount||0)}</td>
-                    <td>
-                        <button class="btn-del" data-id="${item.id}">Hapus</button>
-                    </td>
-                `;
-
-                tableBodyEl.appendChild(tr);
-            });
-        }
-
-        // Delegasi tombol hapus
-        function handleTableClick(e) {
-            if (e.target.classList.contains("btn-del")) {
-                const id = e.target.getAttribute("data-id");
-                const yakin = confirm("Hapus data ini?");
-                if (!yakin) return;
-                deleteIncomeById(id);
-            }
-        }
-
-        async function deleteIncomeById(id) {
-            incomeData = incomeData.filter(item => item.id !== id);
-            await saveDataToJSONBin();
-            await fetchDataFromJSONBin();
-        }
-
-        /********************************************
-         * ADD INCOME FORM
-         ********************************************/
-        async function handleAddIncomeSubmit(e) {
-            e.preventDefault();
-
-            const yearVal = document.getElementById("yearInput").value.trim();
-            const quadVal = document.getElementById("quadrantInput").value.trim();
-            const sectorVal = document.getElementById("sectorInput").value.trim();
-            const amountFormatted = document.getElementById("amountInput").value.trim();
-
-            const amountNum = parseNumberFromIDFormat(amountFormatted);
-
-            if (!yearVal || !quadVal || !sectorVal || !amountNum) {
-                alert("Lengkapi semua field.");
-                return;
-            }
-
-            // bikin ID unik
-            const newItem = {
-                id: Date.now().toString(),
-                year: parseInt(yearVal, 10),
-                quadrant: quadVal.toUpperCase(),
-                sector: sectorVal,
-                amount: amountNum
-            };
-
-            incomeData.push(newItem);
-
-            await saveDataToJSONBin();
-            await fetchDataFromJSONBin();
-
-            // reset form
-            e.target.reset();
-        }
-
-        // Format input jumlah jadi "100.000.000" realtime
-        function handleAmountInput(e) {
-            const raw = e.target.value;
-            const digits = raw.replace(/\D/g, ""); // hanya angka
-            e.target.value = formatNumberID(digits);
-        }
-
-        /********************************************
-         * RENDER ALL
-         ********************************************/
-        function renderAll() {
-            updateSummaryCards();
-            renderDonutChart();
-            renderLineChart();
-            renderTable();
-        }
-
-        /********************************************
-         * INIT
-         ********************************************/
-        document.addEventListener("DOMContentLoaded", () => {
-            // cache table body
-            tableBodyEl = document.querySelector("#incomeTable tbody");
-
-            // event listeners
-            document.getElementById("loginForm").addEventListener("submit", handleLoginSubmit);
-            document.getElementById("logoutBtn").addEventListener("click", handleLogout);
-            document.getElementById("addIncomeForm").addEventListener("submit", handleAddIncomeSubmit);
-            document.getElementById("amountInput").addEventListener("input", handleAmountInput);
-            tableBodyEl.addEventListener("click", handleTableClick);
-
-            // cek session
-            if (isLoggedIn()) {
-                showDashboard();
-                fetchDataFromJSONBin();
-            } else {
-                showLogin();
-            }
-        });
-    </script>
+    <!-- App JS -->
+    <script src="assets/app.js"></script>
 </body>
 </html>

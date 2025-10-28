@@ -5,27 +5,23 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Cashflow Kuadran Monitor</title>
 
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Style -->
     <link rel="stylesheet" href="assets/style.css" />
 
-    <!-- ChartJS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <!-- ================= LOGIN SECTION ================= -->
-    <section id="loginSection" class="card">
+    <!-- ============ LOGIN ============ -->
+    <section id="loginSection" class="card card-glow">
         <div class="login-card-title">Login Admin</div>
         <div class="login-desc">
-            Hanya kamu yang boleh masuk. Setelah login, kamu bisa lihat grafik kuadran,
-            tambah penghasilan, dan hapus data.
+            Masuk dulu untuk lihat income per kuadran (E / S / B / I),
+            tambah data, edit, dan hapus.
         </div>
 
         <div id="loginError" class="login-error-msg">
-            Username / password salah. Perhatikan huruf besar-kecil.
+            Username / password salah.
         </div>
 
         <form id="loginForm">
@@ -57,120 +53,135 @@
                 />
             </div>
 
-            <button type="submit" style="width:100%;margin-top:8px;">Masuk</button>
+            <button type="submit" class="btn-full">Masuk</button>
 
             <div class="note" style="margin-top:12px;">
-                Catatan keamanan: password ini dicek di server (folder /api),
-                jadi tidak kelihatan di browser orang lain.
+                Password dicek di server (folder /api), jadi aman di luar browser publik.
             </div>
         </form>
     </section>
 
 
-    <!-- ================= DASHBOARD SECTION ================= -->
+    <!-- ============ DASHBOARD ============ -->
     <section id="dashboardSection" class="hidden">
 
-        <!-- Topbar -->
-        <div class="topbar card">
-            <div>
+        <!-- TOP BAR -->
+        <div class="card card-glow soft-space topbar-card">
+            <div class="topbar-left">
                 <div class="topbar-title">Cashflow Kuadran Monitor</div>
-                <div class="topbar-sub">Pantau sumber penghasilanmu (E / S / B / I)</div>
+                <div class="topbar-sub">
+                    Pantau sumber penghasilanmu (E / S / B / I)
+                </div>
             </div>
-            <button id="logoutBtn" class="btn-outline" type="button">Logout</button>
+            <button id="logoutBtn" class="btn-outline-pill" type="button">Logout</button>
         </div>
 
-        <!-- ===== RINGKASAN KUADRAN TAHUN TERBARU ===== -->
-        <div class="card">
+        <!-- RINGKASAN KUADRAN TAHUN TERBARU -->
+        <div class="card card-glow soft-space">
             <div class="summary-header">
                 <div class="left">
                     <div class="title">Ringkasan Penghasilan</div>
                     <div class="sub">Per Kuadran (Tahun terbaru)</div>
                 </div>
-                <div class="year-label" id="summaryYear">-</div>
+                <div class="year-pill" id="summaryYear">-</div>
             </div>
 
             <div class="summary-grid">
-                <div class="sum-card" id="cardE">
-                    <div class="sum-label">
+                <div class="sum-card">
+                    <div class="sum-head-row">
                         <span class="quad">E - Employee/Karyawan</span>
                         <span class="sum-percent" id="percentE">0%</span>
                     </div>
-                    <div class="sum-amount" id="amountE">Rp0</div>
+                    <div class="sum-inner">
+                        <div class="sum-amount" id="amountE">Rp0</div>
+                    </div>
                 </div>
 
-                <div class="sum-card" id="cardS">
-                    <div class="sum-label">
+                <div class="sum-card">
+                    <div class="sum-head-row">
                         <span class="quad">S - Self Employed</span>
                         <span class="sum-percent" id="percentS">0%</span>
                     </div>
-                    <div class="sum-amount" id="amountS">Rp0</div>
+                    <div class="sum-inner">
+                        <div class="sum-amount" id="amountS">Rp0</div>
+                    </div>
                 </div>
 
-                <div class="sum-card" id="cardB">
-                    <div class="sum-label">
+                <div class="sum-card">
+                    <div class="sum-head-row">
                         <span class="quad">B - Business / Sistem Jalan Sendiri</span>
                         <span class="sum-percent" id="percentB">0%</span>
                     </div>
-                    <div class="sum-amount" id="amountB">Rp0</div>
+                    <div class="sum-inner">
+                        <div class="sum-amount" id="amountB">Rp0</div>
+                    </div>
                 </div>
 
-                <div class="sum-card" id="cardI">
-                    <div class="sum-label">
+                <div class="sum-card">
+                    <div class="sum-head-row">
                         <span class="quad">I - Investor / Aset</span>
                         <span class="sum-percent" id="percentI">0%</span>
                     </div>
-                    <div class="sum-amount" id="amountI">Rp0</div>
+                    <div class="sum-inner">
+                        <div class="sum-amount" id="amountI">Rp0</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== CHARTS ===== -->
-        <div class="chart-grid">
-
-            <!-- Donut Chart -->
-            <div class="card">
-                <div class="chart-card-header">
-                    <span>Komposisi Kuadran</span>
-                    <span style="font-size:.7rem;color:var(--text-dim);">
-                        Tahun <span id="donutYearLabel">-</span>
-                    </span>
+        <!-- DONUT CHART -->
+        <div class="card card-glow soft-space">
+            <div class="chart-header-row">
+                <div class="chart-title">Komposisi Kuadran</div>
+                <div class="chart-sub">
+                    Tahun <span id="donutYearLabel">-</span>
                 </div>
+            </div>
 
-                <div class="chart-wrapper">
+            <div class="donut-flexbox">
+                <div class="chart-wrapper-donut">
                     <canvas id="donutChart"></canvas>
                 </div>
 
-                <div class="legend-box" id="donutLegend"></div>
-            </div>
-
-            <!-- Line Chart -->
-            <div class="card">
-                <div class="chart-card-header">
-                    <span>Performa Kuadran per Tahun</span>
-                    <span style="font-size:.7rem;color:var(--text-dim);">
-                        Total penghasilan per kuadran (Rp)
-                    </span>
-                </div>
-
-                <div class="chart-wrapper">
-                    <canvas id="lineChart"></canvas>
-                </div>
-
-                <div class="note" style="margin-top:12px;">
-                    Grafik ini nunjukin seberapa kuat masing-masing kuadran (E, S, B, I)
-                    dari tahun ke tahun. Naik = kuadran itu makin dominan di hidupmu.
+                <div class="donut-legend-grid" id="donutLegend">
+                    <!-- diisi JS -->
                 </div>
             </div>
         </div>
 
-        <!-- ===== FORM TAMBAH PENGHASILAN ===== -->
-        <div class="card">
-            <div class="section-title">
-                <span>Tambah Penghasilan (Admin Panel)</span>
-                <span style="font-size:.7rem;color:var(--text-dim);">Data baru langsung disimpan</span>
+        <!-- LINE CHART -->
+        <div class="card card-glow soft-space">
+            <div class="chart-header-row">
+                <div class="chart-title">Performa Kuadran per Tahun</div>
+                <div class="chart-sub">Total penghasilan per kuadran (Rp)</div>
             </div>
 
-            <form id="addIncomeForm">
+            <div class="line-legend-row">
+                <span class="legend-chip"><span class="chip-dot" style="background:#4ade80;"></span>E</span>
+                <span class="legend-chip"><span class="chip-dot" style="background:#22c55e;"></span>S</span>
+                <span class="legend-chip"><span class="chip-dot" style="background:#0ea5e9;"></span>B</span>
+                <span class="legend-chip"><span class="chip-dot" style="background:#a855f7;"></span>I</span>
+            </div>
+
+            <div class="chart-wrapper-line">
+                <canvas id="lineChart"></canvas>
+            </div>
+
+            <div class="note" style="margin-top:12px;">
+                Garis naik = kuadran itu makin dominan income-nya per tahun.
+            </div>
+        </div>
+
+        <!-- FORM TAMBAH / EDIT DATA -->
+        <div class="card card-glow soft-space">
+            <div class="section-title-row">
+                <div class="section-main">Kelola Penghasilan (Admin)</div>
+                <div class="section-sub">Tambah baru / Edit / Simpan</div>
+            </div>
+
+            <form id="incomeForm">
+                <!-- hidden id utk edit -->
+                <input type="hidden" id="editId" value="" />
 
                 <div class="form-row-2col">
                     <div class="form-group">
@@ -199,21 +210,23 @@
                     <label for="amountInput">Nominal per Tahun (Rp)</label>
                     <input id="amountInput" type="text" inputmode="numeric" placeholder="100.000.000" required />
                     <div class="note">
-                        Otomatis pakai titik pemisah ribuan.
-                        Masukkan total setahun untuk sumber ini.
+                        Otomatis pakai titik ribuan. Masukkan total setahun dari sumber ini.
                     </div>
                 </div>
 
-                <button type="submit" style="width:100%;margin-top:8px;">+ Tambah Data</button>
+                <button type="submit" class="btn-full" id="saveBtnLabel">+ Tambah Data</button>
 
+                <button type="button" class="btn-cancel-edit hidden" id="cancelEditBtn">
+                    Batal Edit
+                </button>
             </form>
         </div>
 
-        <!-- ===== TABEL DATA ===== -->
-        <div class="card">
-            <div class="section-title">
-                <span>Data Semua Penghasilan</span>
-                <span style="font-size:.7rem;color:var(--text-dim);">Swipe kanan-kiri kalau tabel melebar</span>
+        <!-- TABEL DATA -->
+        <div class="card card-glow soft-space">
+            <div class="section-title-row">
+                <div class="section-main">Data Semua Penghasilan</div>
+                <div class="section-sub">Swipe kanan-kiri kalau tabel melebar</div>
             </div>
 
             <div class="table-wrapper">
@@ -224,7 +237,7 @@
                             <th>Kuadran</th>
                             <th>Sektor</th>
                             <th>Nominal (Rp)</th>
-                            <th>Aksi</th>
+                            <th style="min-width:90px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -234,16 +247,14 @@
             </div>
 
             <div class="note" style="margin-top:12px;">
-                Kuadran:
-                E = Employee/Karyawan,
-                S = Self-Employed (kamu kerja sendiri, contoh tani harian),
-                B = Business (punya sistem & orang jalanin),
-                I = Investor (uang kerja buat kamu).
+                E = Employee/Karyawan<br/>
+                S = Self-Employed (kamu kerja sendiri)<br/>
+                B = Business (punya sistem & orang jalanin)<br/>
+                I = Investor (uang kerja buat kamu)
             </div>
         </div>
     </section>
 
-    <!-- App JS -->
     <script src="assets/app.js"></script>
 </body>
 </html>

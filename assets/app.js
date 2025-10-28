@@ -1,39 +1,36 @@
 // assets/app.js
 
-// ===== Helper Format Angka =====
+// ===== Helper =====
 function formatNumberID(num) {
     if (num === "" || num === null || num === undefined) return "";
     const n = typeof num === "string" ? parseInt(num, 10) : num;
     if (isNaN(n)) return "";
-    return n.toLocaleString("id-ID"); // titik ribuan
+    return n.toLocaleString("id-ID");
 }
-
 function formatRupiah(num) {
     const formatted = formatNumberID(num);
     return "Rp" + (formatted === "" ? "0" : formatted);
 }
-
-// "100.000.000" -> 100000000
 function parseNumberFromIDFormat(str) {
     if (!str) return 0;
     const digitsOnly = str.replace(/\D/g, "");
     return digitsOnly === "" ? 0 : parseInt(digitsOnly, 10);
 }
 
-// ===== State Global =====
+// ===== State =====
 let incomeData = [];
 let donutChart = null;
 let lineChart = null;
-let tableBodyEl = null;
 
-// ===== DOM Refs =====
+let currentEditId = null; // null = mode tambah, bukan edit
+
+// ===== DOM =====
 const loginSection = document.getElementById("loginSection");
 const dashboardSection = document.getElementById("dashboardSection");
 const loginForm = document.getElementById("loginForm");
 const loginErrorBox = document.getElementById("loginError");
 const logoutBtn = document.getElementById("logoutBtn");
-const addIncomeForm = document.getElementById("addIncomeForm");
-const amountInput = document.getElementById("amountInput");
+
 const summaryYearEl = document.getElementById("summaryYear");
 const donutYearLabelEl = document.getElementById("donutYearLabel");
 
@@ -50,7 +47,17 @@ const percentIEl = document.getElementById("percentI");
 const donutLegendBox = document.getElementById("donutLegend");
 const incomeTableBody = document.querySelector("#incomeTable tbody");
 
-// ===== Session login =====
+const incomeForm = document.getElementById("incomeForm");
+const editIdInput = document.getElementById("editId");
+const yearInput = document.getElementById("yearInput");
+const quadrantInput = document.getElementById("quadrantInput");
+const sectorInput = document.getElementById("sectorInput");
+const amountInput = document.getElementById("amountInput");
+
+const saveBtnLabel = document.getElementById("saveBtnLabel");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+// ===== Session =====
 function isLoggedIn() {
     return localStorage.getItem("loggedIn") === "true";
 }
@@ -63,47 +70,46 @@ function showDashboard() {
     dashboardSection.classList.remove("hidden");
 }
 
-// ===== Backend Calls =====
-
-// POST /api/login
+// ===== API calls =====
 async function apiLogin(username, password) {
     const res = await fetch("/api/login", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ username, password })
     });
-    return res.json(); // {success:true/false}
+    return res.json();
 }
-
-// GET /api/getData
 async function apiGetData() {
     const res = await fetch("/api/getData");
-    return res.json(); // {success:true, data:[...]} atau {success:false,...}
+    return res.json();
 }
-
-// POST /api/saveData
 async function apiSaveData(newItem) {
     const res = await fetch("/api/saveData", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify(newItem)
     });
-    return res.json(); // {success:true, data:[...]} setelah update
+    return res.json();
 }
-
-// POST /api/deleteData
+async function apiUpdateData(updatedItem) {
+    const res = await fetch("/api/updateData", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(updatedItem)
+    });
+    return res.json();
+}
 async function apiDeleteData(id) {
     const res = await fetch("/api/deleteData", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({id})
+        body: JSON.stringify({ id })
     });
-    return res.json(); // {success:true, data:[...]} setelah hapus
+    return res.json();
 }
 
-// ===== Data Utils =====
+// ===== Data transform =====
 function getYearlyTotals() {
-    // hasil: { "2025": {E:...,S:...,B:...,I:...}, ... }
     const yearly = {};
     incomeData.forEach(item => {
         const y = String(item.year);
@@ -127,7 +133,7 @@ function getLatestYear(yearlyTotalsObj) {
     return years[years.length - 1].toString();
 }
 
-// ===== Render Summary Cards =====
+// ===== RENDER SUMMARY =====
 function updateSummaryCards() {
     const yearlyTotals = getYearlyTotals();
     const latestYear = getLatestYear(yearlyTotals);
@@ -161,7 +167,7 @@ function updateSummaryCards() {
     percentIEl.textContent = pct(dataYear.I||0, totalAll);
 }
 
-// ===== Render Donut Chart =====
+// ===== RENDER DONUT =====
 function renderDonutChart() {
     const yearlyTotals = getYearlyTotals();
     const latestYear = getLatestYear(yearlyTotals);
@@ -205,7 +211,6 @@ function renderDonutChart() {
         }
     });
 
-    // Legend bawah donut
     const totalAll = donutDataArr.reduce((a,b)=>a+b,0);
     donutLegendBox.innerHTML = "";
 
@@ -221,24 +226,23 @@ function renderDonutChart() {
             ? "0%"
             : ((q.val/totalAll)*100).toFixed(1)+"%";
 
-        const itemDiv = document.createElement("div");
-        itemDiv.className = "legend-item";
-
-        itemDiv.innerHTML = `
-            <div class="legend-row-top">
-                <div style="display:flex;align-items:center;gap:6px;">
-                    <div class="legend-color" style="background:${q.color};"></div>
-                    <div class="legend-q">${q.label}</div>
+        const div = document.createElement("div");
+        div.className = "donut-legend-item";
+        div.innerHTML = `
+            <div class="donut-row-top">
+                <div class="donut-left">
+                    <div class="donut-dot" style="background:${q.color};"></div>
+                    <div>${q.label}</div>
                 </div>
-                <div class="legend-percent">${percent}</div>
+                <div class="donut-percent">${percent}</div>
             </div>
-            <div class="legend-amount">${formatRupiah(q.val||0)}</div>
+            <div class="donut-amount">${formatRupiah(q.val||0)}</div>
         `;
-        donutLegendBox.appendChild(itemDiv);
+        donutLegendBox.appendChild(div);
     });
 }
 
-// ===== Render Line Chart =====
+// ===== RENDER LINE CHART =====
 function renderLineChart() {
     const yearlyTotals = getYearlyTotals();
     const yearsSorted = Object.keys(yearlyTotals)
@@ -302,12 +306,7 @@ function renderLineChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    labels: {
-                        color: "#ffffff",
-                        font: { size: 10 }
-                    }
-                }
+                legend: { display: false }
             },
             scales: {
                 x: {
@@ -336,7 +335,7 @@ function renderLineChart() {
     });
 }
 
-// ===== Render Table =====
+// ===== RENDER TABLE =====
 function renderTable() {
     incomeTableBody.innerHTML = "";
 
@@ -347,22 +346,23 @@ function renderTable() {
 
     sorted.forEach(item => {
         const tr = document.createElement("tr");
-
         tr.innerHTML = `
             <td>${item.year || "-"}</td>
             <td>${item.quadrant || "-"}</td>
             <td>${item.sector || "-"}</td>
             <td class="text-right">${formatRupiah(item.amount||0)}</td>
             <td>
-                <button class="btn-del" data-id="${item.id}">Hapus</button>
+                <div class="row-actions">
+                    <button class="btn-small btn-edit" data-id="${item.id}">Edit</button>
+                    <button class="btn-del btn-delete" data-id="${item.id}">Hapus</button>
+                </div>
             </td>
         `;
-
         incomeTableBody.appendChild(tr);
     });
 }
 
-// ===== FULL RENDER (dipanggil tiap habis update data) =====
+// ===== RENDER ALL =====
 function renderAll() {
     updateSummaryCards();
     renderDonutChart();
@@ -370,9 +370,43 @@ function renderAll() {
     renderTable();
 }
 
-// ===== Event Handlers =====
+// ===== LOAD DATA AFTER LOGIN =====
+async function reloadDataFromServer() {
+    const result = await apiGetData();
+    if (!result || !result.success) {
+        alert("Gagal ambil data dari server. Cek pengaturan ENV BIN_ID / JSONBIN_API_KEY di backend.");
+        incomeData = [];
+    } else {
+        incomeData = result.data;
+    }
+    renderAll();
+}
 
-// Login
+// ===== FORM MODE HANDLING (TAMBAH vs EDIT) =====
+function setFormToAddMode() {
+    currentEditId = null;
+    editIdInput.value = "";
+    yearInput.value = "";
+    quadrantInput.value = "";
+    sectorInput.value = "";
+    amountInput.value = "";
+
+    saveBtnLabel.textContent = "+ Tambah Data";
+    cancelEditBtn.classList.add("hidden");
+}
+function setFormToEditMode(item) {
+    currentEditId = item.id;
+    editIdInput.value = item.id;
+    yearInput.value = item.year;
+    quadrantInput.value = item.quadrant;
+    sectorInput.value = item.sector;
+    amountInput.value = formatNumberID(item.amount);
+
+    saveBtnLabel.textContent = "Update Data";
+    cancelEditBtn.classList.remove("hidden");
+}
+
+// ===== EVENT: LOGIN =====
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const username = document.getElementById("loginUser").value.trim();
@@ -390,24 +424,31 @@ loginForm.addEventListener("submit", async (e) => {
     }
 });
 
-// Logout
+// ===== EVENT: LOGOUT =====
 logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("loggedIn");
     if (donutChart) { donutChart.destroy(); donutChart = null; }
     if (lineChart) { lineChart.destroy(); lineChart = null; }
     incomeData = [];
+    setFormToAddMode();
     showLogin();
 });
 
-// Tambah Income
-addIncomeForm.addEventListener("submit", async (e) => {
+// ===== EVENT: INPUT RIBUAN REALTIME =====
+amountInput.addEventListener("input", (e) => {
+    const raw = e.target.value;
+    const digits = raw.replace(/\D/g, "");
+    e.target.value = formatNumberID(digits);
+});
+
+// ===== EVENT: SUBMIT FORM TAMBAH / UPDATE =====
+incomeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const yearVal = document.getElementById("yearInput").value.trim();
-    const quadVal = document.getElementById("quadrantInput").value.trim();
-    const sectorVal = document.getElementById("sectorInput").value.trim();
-    const amountFormatted = document.getElementById("amountInput").value.trim();
-
+    const yearVal = yearInput.value.trim();
+    const quadVal = quadrantInput.value.trim();
+    const sectorVal = sectorInput.value.trim();
+    const amountFormatted = amountInput.value.trim();
     const amountNum = parseNumberFromIDFormat(amountFormatted);
 
     if (!yearVal || !quadVal || !sectorVal || !amountNum) {
@@ -415,35 +456,60 @@ addIncomeForm.addEventListener("submit", async (e) => {
         return;
     }
 
-    const newItem = {
-        year: parseInt(yearVal, 10),
-        quadrant: quadVal.toUpperCase(),
-        sector: sectorVal,
-        amount: amountNum
-    };
+    if (currentEditId) {
+        // MODE EDIT
+        const updatedItem = {
+            id: currentEditId,
+            year: parseInt(yearVal, 10),
+            quadrant: quadVal.toUpperCase(),
+            sector: sectorVal,
+            amount: amountNum
+        };
+        const result = await apiUpdateData(updatedItem);
+        if (!result || !result.success) {
+            alert("Gagal update data.");
+            return;
+        }
+        incomeData = result.data;
+        renderAll();
+        setFormToAddMode();
+    } else {
+        // MODE TAMBAH
+        const newItem = {
+            year: parseInt(yearVal, 10),
+            quadrant: quadVal.toUpperCase(),
+            sector: sectorVal,
+            amount: amountNum
+        };
+        const result = await apiSaveData(newItem);
+        if (!result || !result.success) {
+            alert("Gagal menyimpan data.");
+            return;
+        }
+        incomeData = result.data;
+        renderAll();
+        setFormToAddMode();
+    }
+});
 
-    const result = await apiSaveData(newItem);
-    if (!result || !result.success) {
-        alert("Gagal menyimpan data ke server.");
+// ===== EVENT: BATAL EDIT =====
+cancelEditBtn.addEventListener("click", () => {
+    setFormToAddMode();
+});
+
+// ===== EVENT: CLICK DI TABEL (EDIT / HAPUS) =====
+incomeTableBody.addEventListener("click", async (e) => {
+    // EDIT
+    if (e.target.classList.contains("btn-edit")) {
+        const id = e.target.getAttribute("data-id");
+        const item = incomeData.find(d => d.id === id);
+        if (!item) return;
+        setFormToEditMode(item);
         return;
     }
 
-    incomeData = result.data;
-    renderAll();
-
-    e.target.reset();
-});
-
-// Input format ribuan realtime
-amountInput.addEventListener("input", (e) => {
-    const raw = e.target.value;
-    const digits = raw.replace(/\D/g, "");
-    e.target.value = formatNumberID(digits);
-});
-
-// Delete income (event delegation di tabel)
-incomeTableBody.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("btn-del")) {
+    // HAPUS
+    if (e.target.classList.contains("btn-delete")) {
         const id = e.target.getAttribute("data-id");
         const yakin = confirm("Hapus data ini?");
         if (!yakin) return;
@@ -456,22 +522,14 @@ incomeTableBody.addEventListener("click", async (e) => {
 
         incomeData = result.data;
         renderAll();
+        // kalau lagi edit item yang dihapus → reset form
+        if (currentEditId === id) {
+            setFormToAddMode();
+        }
     }
 });
 
-// ===== Load data setelah login =====
-async function reloadDataFromServer() {
-    const result = await apiGetData();
-    if (!result || !result.success) {
-        alert("Gagal ambil data dari server. (Cek env BIN_ID / KEY di backend)");
-        incomeData = [];
-    } else {
-        incomeData = result.data;
-    }
-    renderAll();
-}
-
-// ===== On page load =====
+// ===== INIT PAGE LOAD =====
 document.addEventListener("DOMContentLoaded", async () => {
     if (isLoggedIn()) {
         showDashboard();
@@ -479,4 +537,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
         showLogin();
     }
+    setFormToAddMode();
 });

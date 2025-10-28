@@ -24,19 +24,17 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // 1. get existing
         const latestUrl = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
         const putUrl = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
+        // get current
         const rGet = await fetch(latestUrl, {
-            headers: {
-                "X-Master-Key": JSONBIN_API_KEY
-            }
+            headers: { "X-Master-Key": JSONBIN_API_KEY }
         });
         const jGet = await rGet.json();
         const currentArr = Array.isArray(jGet.record) ? jGet.record : [];
 
-        // 2. push new item
+        // push new
         const newItem = {
             id: Date.now().toString(),
             year: parseInt(year,10),
@@ -46,7 +44,7 @@ module.exports = async (req, res) => {
         };
         currentArr.push(newItem);
 
-        // 3. save back
+        // save
         await fetch(putUrl, {
             method: "PUT",
             headers: {

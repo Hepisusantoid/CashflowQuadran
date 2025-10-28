@@ -26,19 +26,14 @@ module.exports = async (req, res) => {
         const latestUrl = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
         const putUrl = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-        // Ambil data sekarang
         const rGet = await fetch(latestUrl, {
-            headers: {
-                "X-Master-Key": JSONBIN_API_KEY
-            }
+            headers: { "X-Master-Key": JSONBIN_API_KEY }
         });
         const jGet = await rGet.json();
         let arr = Array.isArray(jGet.record) ? jGet.record : [];
 
-        // Hapus item yg match id
-        arr = arr.filter(item => item.id !== id);
+        arr = arr.filter(x => x.id !== id);
 
-        // Simpan balik
         await fetch(putUrl, {
             method: "PUT",
             headers: {
